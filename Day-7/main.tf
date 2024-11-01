@@ -3,7 +3,7 @@ provider "aws" {
 }
 
 provider "vault" {
-  address = "<>:8200"
+  address = "http://54.162.113.210:8300"
   skip_child_token = true
 
   auth_login {
@@ -17,16 +17,16 @@ provider "vault" {
 }
 
 data "vault_kv_secret_v2" "example" {
-  mount = "secret" // change it according to your mount
-  name  = "test-secret" // change it according to your secret
+  mount = "kv" // change it according to your mount
+  name  = "s3_name" // change it according to your secret
 }
 
-resource "aws_instance" "my_instance" {
-  ami           = "ami-053b0d53c279acc90"
-  instance_type = "t2.micro"
+
+resource "aws_s3_bucket" "example" {
+  bucket = data.vault_kv_secret_v2.example.data["username"]
 
   tags = {
-    Name = "test"
-    Secret = data.vault_kv_secret_v2.example.data["foo"]
+    Name        = "Vault-bucket"
+    Environment = "Dev"
   }
 }
